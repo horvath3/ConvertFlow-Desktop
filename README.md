@@ -282,6 +282,3 @@ hiba reprodukálásának lépései
 képernyőkép (ha van)
 
 ⭐ Ha tetszik a projekt, adj egy Star-t a GitHubon!
-
-Ezt egyben be lehet másolni a `README.md` fájlba.  
-A következő lépés utána: **képernyőképek (`screenshots/home.png`) hozzáadása**, mert jelenleg a README hivatkozik rájuk, de még nem léteznek
