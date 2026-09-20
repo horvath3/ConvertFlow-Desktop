@@ -1,0 +1,217 @@
+name: ConvertFlow Desktop CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v1.0.0)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  releases: write
+
+env:
+  PYTHON_VERSION: '3.12'
+  BUILD_VERSION: '1.0.0'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-qt
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v
+
+      - name: Lint check (basic syntax)
+        run: |
+          python -m py_compile main.py
+          python -m py_compile app/application.py
+          python -m py_compile app/ui/main_window.py
+          python -m py_compile app/ui/home_page.py
+          python -m py_compile app/ui/video_converter_page.py
+          python -m py_compile app/ui/video_compressor_page.py
+          python -m py_compile app/ui/settings_page.py
+          python -m py_compile app/ui/conversion_item_widget.py
+          python -m py_compile app/ui/dialogs.py
+
+  build:
+    name: Build Windows Executable
+    runs-on: windows-latest
+    needs: test
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Download FFmpeg (for build)
+        run: |
+          $ffmpegUrl = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z"
+          $output = "ffmpeg.7z"
+          Invoke-WebRequest -Uri $ffmpegUrl -OutFile $output
+          7z x $output -o"ffmpeg_temp" -y
+          $ffmpegDir = Get-ChildItem ffmpeg_temp -Directory | Select-Object -First 1
+          Copy-Item "$ffmpegDir\bin\ffmpeg.exe" -Destination "tools\ffmpeg\ffmpeg.exe"
+          Copy-Item "$ffmpegDir\bin\ffprobe.exe" -Destination "tools\ffmpeg\ffprobe.exe"
+          Remove-Item $output
+          Remove-Item -Recurse -Force ffmpeg_temp
+        shell: powershell
+
+      - name: Generate version info
+        run: |
+          $version = "${{ env.BUILD_VERSION }}"
+          if ("${{ github.event_name }}" -eq "push" -and "${{ github.ref }}" -like "refs/tags/*") {
+            $version = "${{ github.ref_name }}".TrimStart('v')
+          } elseif ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ github.event.inputs.version }}") {
+            $version = "${{ github.event.inputs.version }}".TrimStart('v')
+          }
+          $buildDate = Get-Date -Format "yyyyMMdd"
+          $versionInfo = @{
+            version = $version
+            build_date = $buildDate
+            name = "ConvertFlow Desktop"
+            author = "ConvertFlow"
+          } | ConvertTo-Json -Depth 3
+          $versionInfo | Out-File -FilePath version.json -Encoding utf8
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+          echo "BUILD_DATE=$buildDate" >> $env:GITHUB_ENV
+        shell: powershell
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller ConvertFlowDesktop.spec --noconfirm
+          if (Test-Path "dist\ConvertFlowDesktop\tools\ffmpeg") {
+            Remove-Item -Recurse -Force "dist\ConvertFlowDesktop\tools\ffmpeg"
+          }
+          New-Item -ItemType Directory -Path "dist\ConvertFlowDesktop\tools\ffmpeg" -Force
+          Copy-Item "tools\ffmpeg\ffmpeg.exe" -Destination "dist\ConvertFlowDesktop\tools\ffmpeg\"
+          Copy-Item "tools\ffmpeg\ffprobe.exe" -Destination "dist\ConvertFlowDesktop\tools\ffmpeg\"
+          Copy-Item "version.json" -Destination "dist\ConvertFlowDesktop\"
+
+      - name: Create Portable ZIP
+        run: |
+          Compress-Archive -Path "dist\ConvertFlowDesktop\*" -DestinationPath "dist\ConvertFlowDesktop-${{ env.VERSION }}-portable.zip" -Force
+        shell: powershell
+
+      - name: Verify build
+        run: |
+          $exe = "dist\ConvertFlowDesktop\ConvertFlowDesktop.exe"
+          if (Test-Path $exe) {
+            $size = (Get-Item $exe).Length
+            echo "Executable size: $size bytes"
+            echo "Build successful!"
+          } else {
+            echo "ERROR: Executable not found!"
+            exit 1
+          }
+        shell: powershell
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConvertFlowDesktop-${{ env.VERSION }}-windows
+          path: |
+            dist/ConvertFlowDesktop/
+            dist/ConvertFlowDesktop-${{ env.VERSION }}-portable.zip
+          retention-days: 30
+
+      - name: Create Release (on tag push)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ConvertFlow Desktop ${{ github.ref_name }}
+          body: |
+            ## ConvertFlow Desktop ${{ github.ref_name }}
+            
+            ### Changes
+            - See [CHANGELOG.md](CHANGELOG.md) for details
+            
+            ### Downloads
+            - **Portable ZIP**: `ConvertFlowDesktop-${{ env.VERSION }}-portable.zip` (recommended)
+            - **Folder distribution**: Extract the artifact zip above
+            
+            ### System Requirements
+            - Windows 10/11 (64-bit)
+            - No installation required (portable)
+            
+            ### Verification
+            - SHA256 checksums available in release assets
+          files: |
+            dist/ConvertFlowDesktop-${{ env.VERSION }}-portable.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checksum:
+    name: Generate Checksums
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ConvertFlowDesktop-${{ env.VERSION }}-windows
+          path: artifacts
+
+      - name: Generate SHA256
+        run: |
+          $files = Get-ChildItem artifacts -Recurse -File | Where-Object { $_.Extension -in '.exe', '.zip' }
+          foreach ($file in $files) {
+            $hash = Get-FileHash -Algorithm SHA256 $file.FullName
+            echo "$($hash.Hash)  $($file.Name)" | Out-File -FilePath "artifacts\SHA256SUMS.txt" -Encoding ascii -Append
+          }
+          Get-Content "artifacts\SHA256SUMS.txt"
+        shell: powershell
+
+      - name: Upload checksums
+        uses: actions/upload-artifact@v4
+        with:
+          name: checksums-${{ env.VERSION }}
+          path: artifacts/SHA256SUMS.txt
+          retention-days: 90
+
+      - name: Attach checksums to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: artifacts/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

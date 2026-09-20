@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <!-- Background gradient - deep navy to black -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17"/>
+      <stop offset="50%" stop-color="#06080d"/>
+      <stop offset="100%" stop-color="#030406"/>
+    </linearGradient>
+    
+    <!-- Primary accent gradient - electric blue to cyan to sky -->
+    <linearGradient id="accentPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e40af"/>
+      <stop offset="25%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="75%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    
+    <!-- Secondary accent - purple to pink -->
+    <linearGradient id="accentSecondary" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#581c87"/>
+      <stop offset="30%" stop-color="#8b5cf6"/>
+      <stop offset="60%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    
+    <!-- Glow gradient for outer ring -->
+    <linearGradient id="glowRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0.4"/>
+    </linearGradient>
+    
+    <!-- Inner highlight -->
+    <linearGradient id="innerHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    
+    <!-- Arrow gradient 1 - input (blue-cyan) -->
+    <linearGradient id="arrowInput" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    
+    <!-- Arrow gradient 2 - output (purple-pink) -->
+    <linearGradient id="arrowOutput" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="50%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Stronger glow for background elements -->
+    <filter id="strongGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Soft shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    
+    <!-- Inner glow for arrows -->
+    <filter id="innerGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="blur" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  
+  <!-- Base background - rounded square with subtle border -->
+  <rect x="12" y="12" width="232" height="232" rx="44" fill="url(#bgGrad)"/>
+  
+  <!-- Outer glow ring -->
+  <circle cx="128" cy="128" r="108" fill="none" stroke="url(#glowRing)" stroke-width="2" opacity="0.6" filter="url(#strongGlow)"/>
+  
+  <!-- Subtle inner ring -->
+  <circle cx="128" cy="128" r="102" fill="none" stroke="#1e293b" stroke-width="0.5" opacity="0.5"/>
+  
+  <!-- Central conversion symbol - two interlocking arrows forming continuous flow -->
+  <g transform="translate(128, 128)" filter="url(#glow)">
+    
+    <!-- Arrow 1 - Input (coming from left, pointing right) - Blue/Cyan gradient -->
+    <path d="M-64 -4 C-64 -16, -52 -24, -40 -24 L-8 -24 L-8 -40 L-40 -4 L-8 32 L-8 24 L-40 24 C-52 24, -64 16, -64 4 Z" 
+          fill="url(#arrowInput)" 
+          opacity="0.95"
+          filter="url(#innerGlow)"/>
+    
+    <!-- Arrow 2 - Output (coming from right, pointing left) - Purple/Pink gradient -->
+    <path d="M64 -4 C64 -16, 52 -24, 40 -24 L8 -24 L8 -40 L40 -4 L8 32 L8 24 L40 24 C52 24, 64 16, 64 4 Z" 
+          fill="url(#arrowOutput)" 
+          opacity="0.95"
+          filter="url(#innerGlow)"
+          transform="rotate(180)"/>
+    
+    <!-- Central connecting element - flowing line between arrows -->
+    <path d="M-12 0 Q0 -10 12 0 Q0 10 -12 0" 
+          stroke="url(#accentPrimary)" 
+          stroke-width="3" 
+          fill="none" 
+          stroke-linecap="round" 
+          opacity="0.8"
+          stroke-dasharray="8,4">
+      <animate attributeName="stroke-dashoffset" from="0" to="12" dur="2s" repeatCount="indefinite"/>
+    </path>
+    
+    <!-- Small accent dots orbiting -->
+    <circle cx="-75" cy="-55" r="2.5" fill="#06b6d4" opacity="0.7" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.5s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 -75 -55" to="360 -75 -55" dur="8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="78" cy="58" r="2" fill="#8b5cf6" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.6;0.1;0.6" dur="2s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 78 58" to="-360 78 58" dur="6s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="-70" cy="65" r="1.5" fill="#38bdf8" opacity="0.5" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.5;0.1;0.5" dur="3s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 -70 65" to="360 -70 65" dur="10s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="72" cy="-52" r="1.5" fill="#a855f7" opacity="0.6" filter="url(#glow)">
+      <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2.2s" repeatCount="indefinite"/>
+      <animateTransform attributeName="transform" type="rotate" from="0 72 -52" to="-360 72 -52" dur="7s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- Corner accent markers -->
+  <g fill="url(#accentPrimary)" opacity="0.4">
+    <rect x="28" y="28" width="4" height="4" rx="1"/>
+    <rect x="224" y="28" width="4" height="4" rx="1"/>
+    <rect x="28" y="224" width="4" height="4" rx="1"/>
+    <rect x="224" y="224" width="4" height="4" rx="1"/>
+  </g>
+  
+  <!-- "CF" monogram - subtle watermark -->
+  <text x="128" y="198" text-anchor="middle" font-family="Segoe UI, system-ui, sans-serif" font-size="14" font-weight="700" fill="url(#accentPrimary)" fill-opacity="0.1" letter-spacing="1.5">CF</text>
+</svg>

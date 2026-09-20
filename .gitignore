@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+build/
+dist/
+*.spec.bak
+logs/*.log
+output/*
+!output/.gitkeep
+tools/ffmpeg/ffmpeg.exe
+tools/ffmpeg/ffprobe.exe
+%APPDATA%/
