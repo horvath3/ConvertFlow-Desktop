@@ -6,7 +6,7 @@
 
 **Modern, offline video converter and compressor for Windows**
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/ConvertFlowDesktop/releases)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/horvath3/ConvertFlowDesktop/releases)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![PySide6](https://img.shields.io/badge/PySide6-6.7-green.svg)](https://pypi.org/project/PySide6/)
 [![FFmpeg](https://img.shields.io/badge/FFmpeg-7.0-orange.svg)](https://ffmpeg.org/)
@@ -75,7 +75,7 @@
 
 ### Installation (End Users)
 
-1. Download the latest **`ConvertFlowDesktop-<version>-portable.zip`** from [Releases](https://github.com/yourusername/ConvertFlowDesktop/releases)
+1. Download the latest **`ConvertFlowDesktop-<version>-portable.zip`** from [Releases](https://github.com/horvath3/ConvertFlowDesktop/releases)
 2. Extract to any folder
 3. Run `ConvertFlowDesktop.exe`
 
@@ -85,7 +85,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/ConvertFlowDesktop.git
+git clone https://github.com/horvath3/ConvertFlowDesktop.git
 cd ConvertFlowDesktop
 
 # Run development script (creates venv, installs deps, launches app)
@@ -258,8 +258,8 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/ConvertFlowDesktop/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/ConvertFlowDesktop/discussions)
+- **Issues**: [GitHub Issues](https://github.com/horvath3/ConvertFlowDesktop/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/horvath3/ConvertFlowDesktop/discussions)
 
 ---
 
