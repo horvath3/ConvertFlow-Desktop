@@ -24,7 +24,18 @@ Modern offline videókonvertáló és tömörítő Windowsra.
 
 ## 📸 Képek
 
+
+### Főoldal
 ![Főoldal](screenshots/home.png)
+
+### Videó konvertálás
+![Konvertáló](screenshots/converter.png)
+
+### Videó tömörítés
+![Tömörítő](screenshots/compressor.png)
+
+### Beállítások
+![Beállítások](screenshots/settings.png)
 
 
 ## 💻 Telepítés
